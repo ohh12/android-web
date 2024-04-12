@@ -1,16 +1,151 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Android网站示例</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-</head>
-<body>
-    <h1>Welcome to Android Website </h1>
-    <p>This is a simple website example demonstrating integration with Android.</p>
-    <button onclick="showMessage()">点击按钮开始验证!</button>
-    <div id="message"></div>
-    <script src="android.js"></script>
-</body>
-</html>
+ <!DOCTYPE html>
+
+    <html lang="en">
+
+
+    <head>
+
+        <meta charset="UTF-8">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+        <title>VAPTCHA验证码示例-Android</title>
+
+        <!-- 在这里配置你的v3.js资源地址,eg: https://xxx.com/v3.js -->
+
+        <script src="/v3.js"></script>
+
+    </head>
+
+
+    <body>
+
+        <script>
+
+            window.VAPTCHAtimeout = setTimeout(() => {
+
+                var data = {
+
+                    signal: 'error',
+
+                    data: 'error',
+
+                };
+
+                window.VAPTCHAInterface.signal(JSON.stringify(data));
+
+            }, 5 * 1000);
+
+        </script>
+
+        <script src="./v3.js"></script> <!-- 在这里配置你的v3.js资源地址,e.g.: https://xxx.com/v3.js -->
+
+        <script>
+
+            var qs = getQueryString();
+
+            var vobj;
+
+            if (qs != []) {
+
+                var vid = qs['vid'];
+
+                var lang = qs['lang'];
+
+                var scene = qs['scene'] || 0;
+
+                var area = qs['area'] || 'cn';
+
+
+                vaptcha({
+
+                    vid: vid,
+
+                    type: 'invisible',
+
+                    lang: lang,
+
+                    scene: scene,
+
+                    area: area,
+
+                }).then(function (obj) {
+
+                    obj.listen('pass', function () {
+
+                        var data = {
+
+                            signal: 'pass',
+
+                            data: obj.getServerToken(),
+
+                        };
+
+                        window.VAPTCHAInterface.signal(JSON.stringify(data));
+
+                    });
+
+                    obj.listen('close', function () {
+
+                        var data = {
+
+                            signal: 'cancel',
+
+                            data: '',
+
+                        };
+
+                        window.VAPTCHAInterface.signal(JSON.stringify(data));
+
+                    });
+
+                    clearTimeout(window.VAPTCHAtimeout);
+
+                    obj.validate();
+
+                });
+
+            }
+
+
+            function getQueryString() {
+
+                var qs = location.search.substr(1), // 获取url中"?"符后的字串
+
+                    args = {}, // 保存参数数据的对象
+
+                    items = qs.length ? qs.split('&') : [], // 取得每一个参数项,
+
+                    item = null,
+
+                    len = items.length;
+
+
+                for (var i = 0; i < len; i++) {
+
+                    item = items[i].split('=');
+
+                    var name = decodeURIComponent(item[0]),
+
+                        value = decodeURIComponent(item[1]);
+
+                    if (name) {
+
+                        args[name] = value;
+
+                    }
+
+                }
+
+                return args;
+
+            }
+
+        </script>
+
+    </body>
+
+
+    </html>
